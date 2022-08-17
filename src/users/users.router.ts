@@ -5,6 +5,7 @@ import {
 	deleteUser,
 	getAllUsers,
 	getUserById,
+	getUserProfile,
 	updateUser,
 	updateUserInfo,
 } from './users.controller';
@@ -14,6 +15,8 @@ export const userRouter = Router();
 userRouter.get('/', auth, getAllUsers);
 
 userRouter.get('/:id', getUserById);
+
+userRouter.get('/me', auth, getUserProfile);
 
 userRouter.put('/:id', auth, updateUser);
 

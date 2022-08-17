@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { sign } from 'jsonwebtoken';
 import * as argon from 'argon2';
 
-import { parsePassword, throwError, toNewUser } from '../users/users.utils';
+import { parseEmail, parsePassword, throwError, toNewUser } from '../users/users.utils';
 import UserModel from '../users/users.model';
 import { NewUser, User } from '../users/users.interface';
 import CartModel from '../carts/carts.model';
@@ -51,9 +51,8 @@ export const register = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
 	try {
-		let email: string = req.body.email;
-		email = email.toLowerCase();
-		const password = req.body.password;
+		const email: string = parseEmail(req.body.email).toLowerCase();
+		const password = parsePassword(req.body.password);
 		const user = await UserModel.findOne({ email });
 
 		const passwordCorrect =

@@ -4,14 +4,16 @@ import { User } from '../users/users.interface';
 import UserModel from '../users/users.model';
 import { getDecodedToken } from './auth.util';
 
-export const auth = async (req: Request, _res: Response, next: NextFunction) => {
+export const auth = async (req: Request, res: Response, next: NextFunction) => {
 	try {
+		if (!req.headers.authorization)
+			return res.status(403).send('Forbidden Exception. Token must be provided');
 		const decodedToken = getDecodedToken(String(req.headers.authorization));
 		const user: User | null = await UserModel.findById(decodedToken.id);
 		req.currentUser = user;
-		next();
+		return next();
 	} catch (error: unknown) {
-		next(error);
+		return next(error);
 	}
 };
 

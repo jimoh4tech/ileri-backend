@@ -36,6 +36,18 @@ export const getUserById = async (req: Request, res: Response) => {
 	}
 };
 
+export const getUserProfile = async (req: Request, res: Response) => {
+	try {
+		const user = req.currentUser;
+		if (!user) return res.status(401).send('Authorization Exception.');
+
+		const userObj = await UserModel.findById(user.id);
+		return res.status(200).json(userObj);
+	} catch (error: unknown) {
+		return res.status(400).send(throwError(error));
+	}
+};
+
 export const updateUserInfo = async (req: Request, res: Response) => {
 	try {
 		const user = req.currentUser;
@@ -44,7 +56,6 @@ export const updateUserInfo = async (req: Request, res: Response) => {
 		const { id } = req.params;
 		const name = parseName(req.body.name);
 		const phone = parsePhone(req.body.phone);
-		
 
 		const updatedUser = await UserModel.findByIdAndUpdate(
 			id,

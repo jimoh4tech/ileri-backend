@@ -36,8 +36,8 @@ export const parsePhone = (phone: unknown): string => {
 		throw new Error('Incorrect or missing phone ' + phone);
 	}
 
-	if (phone.length < 11) {
-		throw new Error('Phone number must be at least 5 characters');
+	if (phone.length < 10) {
+		throw new Error('Phone number must be at least 10 characters');
 	}
 	return phone;
 };

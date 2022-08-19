@@ -12,7 +12,7 @@ const schema = new Schema<User>({
 	phone: {
 		type: String,
 		required: [true, 'Please add number'],
-		minLength: 11,
+		minLength: 10,
 	},
 	email: { type: String, required: [true, 'Email is required!'], unique: true },
 	address: { type: String },

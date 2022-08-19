@@ -7,7 +7,6 @@ import { userRouter } from './users/users.router';
 import { authRouter } from './auth/auth.router';
 import { itemRouter } from './items/items.router';
 import { cartRouter } from './carts/carts.router';
-import { paymentRouter } from './payments/payments.router';
 import { orderRouter } from './orders/orders.router';
 
 export const app: Application = express();
@@ -24,7 +23,6 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/items', itemRouter);
 app.use('/api/v1/carts', cartRouter);
 app.use('/api/v1/orders', orderRouter);
-app.use('/api/v1/payments', paymentRouter);
 
 app.use(errorHandler);
 app.use(notFoundHandler);

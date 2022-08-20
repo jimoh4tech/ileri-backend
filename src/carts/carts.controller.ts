@@ -22,11 +22,6 @@ export const createCart = async (req: Request, res: Response) => {
 				.status(401)
 				.send('Unauthorized exception. Only accessible authenticated users.');
 
-		if (!item)
-			return res
-				.status(403)
-				.send('Forbidden exception. Cannot add empty item to cart.');
-
 		const existingCart: Cart = await CartModel.findOne({ user: user.id });
 
 		if (!existingCart) {

@@ -370,13 +370,6 @@ describe('Items API', () => {
 			expect(deteltedItem.body[0].deliveryValue).not.toBe(
 				items.body[0].deliveryValue
 			);
-			expect(deteltedItem.body[0].discount).not.toBe(items.body[0].discount);
-			expect(deteltedItem.body[0].reviews.rating).not.toBe(
-				items.body[0].reviews.rating
-			);
-			expect(deteltedItem.body[0].reviews.numReviews).not.toBe(
-				items.body[0].reviews.numReviews
-			);
 			expect(deteltedItem.body[0].createdAt).not.toBe(items.body[0].createdAt);
 			expect(deteltedItem.body[0].updatedAt).not.toBe(items.body[0].updatedAt);
 		});

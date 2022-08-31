@@ -5,6 +5,7 @@ import {
 	changePassword,
 	login,
 	register,
+	requestPasswordReset,
 	resetPassword,
 } from './auth.controller';
 import { auth } from './auth.middleware';
@@ -17,4 +18,6 @@ authRouter.post('/login', login);
 
 authRouter.put('/:id', auth, changePassword);
 
-authRouter.put('/', auth, resetPassword);
+authRouter.post('/requestPasswordReset', requestPasswordReset);
+
+authRouter.post('/resetPassword', resetPassword);

@@ -4,10 +4,18 @@ import { Request, Response } from 'express';
 import { sign } from 'jsonwebtoken';
 import * as argon from 'argon2';
 
-import { parseEmail, parsePassword, throwError, toNewUser } from '../users/users.utils';
+import {
+	parseEmail,
+	parsePassword,
+	throwError,
+	toNewUser,
+} from '../users/users.utils';
 import UserModel from '../users/users.model';
 import { NewUser, User } from '../users/users.interface';
 import CartModel from '../carts/carts.model';
+import { Token } from './auth.interface';
+import TokenModel from './auth.token.model';
+import { sendEmail } from './email/sendEmail';
 
 export const register = async (req: Request, res: Response) => {
 	try {
@@ -24,6 +32,14 @@ export const register = async (req: Request, res: Response) => {
 		newUser.password = hash;
 
 		const createdUser: User = await UserModel.create(newUser);
+		sendEmail(
+			createdUser.email,
+			'ILERI-OLUWA JIM-KAD',
+			{
+				name: createdUser.name,
+			},
+			'./template/welcome.handlebars'
+		);
 
 		const userForToken = {
 			email: createdUser.email,
@@ -136,23 +152,78 @@ export const changePassword = async (req: Request, res: Response) => {
 	}
 };
 
+export const requestPasswordReset = async (req: Request, res: Response) => {
+	try {
+		const { email } = req.body;
+		const user = await UserModel.findOne({ email });
+		if (!user) return res.status(404).send(`User ${email} not found!`);
+
+		const token: Token = await TokenModel.findOne({ userId: user.id });
+		if (token) await TokenModel.findOneAndDelete({ userId: token.userId });
+
+		const resetToken =
+			Math.random() * 1000 + 'jHDG6iutg&*' + Math.random() * 3000 + 'jk789jg';
+		const hash = await argon.hash(resetToken);
+
+		await TokenModel.create({
+			userId: user.id,
+			token: hash,
+			createdAt: Date.now(),
+		});
+
+		const clientURL = process.env.CLIENT_URL || 'test-environment';
+
+		const link = `${clientURL}/passwordReset?token=${resetToken}&id=${user.id}`;
+
+		sendEmail(
+			user.email,
+			'Password Reset Request',
+			{
+				name: user.name,
+				link,
+			},
+			'./template/requestResetPassword.handlebars'
+		);
+		return res.status(200).end();
+	} catch (error: unknown) {
+		return res.status(400).send(throwError(error));
+	}
+};
+
 export const resetPassword = async (req: Request, res: Response) => {
 	try {
-		const user = req.currentUser;
-		let password = parsePassword(req.body.password);
-		password = await argon.hash(password);
+		const { userId, token, password } = req.body;
+		const passwordResetToken = await TokenModel.findOne({ userId });
+		if (!passwordResetToken)
+			return res.status(403).send('Invalid or expired password reset tokens');
 
-		const updatedUser = await UserModel.findByIdAndUpdate(
-			user.id,
-			{ password },
+		const isValid = await argon.verify(passwordResetToken.token, token);
+
+		if (!isValid)
+			return res.status(403).send('Invalid or expired password reset token');
+
+		const hash = await argon.hash(password);
+		const user = await UserModel.findByIdAndUpdate(
+			userId,
+			{ password: hash },
 			{
 				new: true,
 				runValidators: true,
 			}
 		);
 
-		res.status(200).json(updatedUser);
+		sendEmail(
+			user.email,
+			'Password Reset Successfully',
+			{
+				name: user.name,
+			},
+			'./template/resetPassword.handlebars'
+		);
+
+		await TokenModel.findOneAndDelete({ userId });
+		return res.status(200).end();
 	} catch (error: unknown) {
-		res.status(400).send(throwError(error));
+		return res.status(400).send(throwError(error));
 	}
 };

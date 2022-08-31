@@ -30,6 +30,6 @@ export interface UserFields {
 }
 
 export interface Token {
-	phone: string;
+	email: string;
 	id: string;
 }

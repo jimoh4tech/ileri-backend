@@ -31,7 +31,7 @@ const parseImageUrl = (image: unknown): string => {
 };
 
 const parseDeliveryValue = (value: unknown): number => {
-	if (!value || !isNumber(value) || ![1, 2, 3, 4].includes(value))
+	if (!value || !isNumber(value) || ![1, 2, 3, 4, 5, 6, 7].includes(value))
 		throw new Error('Incorrect or missing delivery value ' + value);
 	return value;
 };

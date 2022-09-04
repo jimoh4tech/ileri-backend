@@ -32,14 +32,6 @@ export const register = async (req: Request, res: Response) => {
 		newUser.password = hash;
 
 		const createdUser: User = await UserModel.create(newUser);
-		sendEmail(
-			createdUser.email,
-			'ILERI-OLUWA JIM-KAD',
-			{
-				name: createdUser.name,
-			},
-			'./template/welcome.handlebars'
-		);
 
 		const userForToken = {
 			email: createdUser.email,
@@ -162,7 +154,7 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
 		if (token) await TokenModel.findOneAndDelete({ userId: token.userId });
 
 		const resetToken =
-			Math.random() * 1000 + 'jHDG6iutg&*' + Math.random() * 3000 + 'jk789jg';
+			Math.random() * 1000 + 'jHDG6iutgYTT' + Math.random() * 3000 + 'jk78UKR9jg';
 		const hash = await argon.hash(resetToken);
 
 		await TokenModel.create({
@@ -196,9 +188,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 		const passwordResetToken = await TokenModel.findOne({ userId });
 		if (!passwordResetToken)
 			return res.status(403).send('Invalid or expired password reset tokens');
-
 		const isValid = await argon.verify(passwordResetToken.token, token);
-
 		if (!isValid)
 			return res.status(403).send('Invalid or expired password reset token');
 

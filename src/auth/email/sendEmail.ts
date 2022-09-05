@@ -14,6 +14,8 @@ const sendEmail = (
 		
 		const transporter = createTransport({
 			service: 'gmail',
+			port: 465,
+			secure: true,
 			auth: {
 				user: process.env.EMAIL_USERNAME,
 				pass: process.env.EMAIL_PASSWORD,

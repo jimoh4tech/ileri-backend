@@ -15,7 +15,6 @@ import { NewUser, User } from '../users/users.interface';
 import CartModel from '../carts/carts.model';
 import { Token } from './auth.interface';
 import TokenModel from './auth.token.model';
-import { sendEmail } from './email/sendEmail';
 
 export const register = async (req: Request, res: Response) => {
 	try {
@@ -154,7 +153,10 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
 		if (token) await TokenModel.findOneAndDelete({ userId: token.userId });
 
 		const resetToken =
-			Math.random() * 1000 + 'jHDG6iutgYTT' + Math.random() * 3000 + 'jk78UKR9jg';
+			Math.random() * 1000 +
+			'jHDG6iutgYTT' +
+			Math.random() * 3000 +
+			'jk78UKR9jg';
 		const hash = await argon.hash(resetToken);
 
 		await TokenModel.create({
@@ -164,19 +166,12 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
 		});
 
 		const clientURL = process.env.CLIENT_URL || 'test-environment';
-
 		const link = `${clientURL}/passwordReset?token=${resetToken}&id=${user.id}`;
 
-		sendEmail(
-			user.email,
-			'Password Reset Request',
-			{
-				name: user.name,
-				link,
-			},
-			'./template/requestResetPassword.handlebars'
-		);
-		return res.status(200).end();
+		return res.status(200).json({
+			name: user.name,
+			link,
+		});
 	} catch (error: unknown) {
 		return res.status(400).send(throwError(error));
 	}
@@ -193,22 +188,13 @@ export const resetPassword = async (req: Request, res: Response) => {
 			return res.status(403).send('Invalid or expired password reset token');
 
 		const hash = await argon.hash(password);
-		const user = await UserModel.findByIdAndUpdate(
+		await UserModel.findByIdAndUpdate(
 			userId,
 			{ password: hash },
 			{
 				new: true,
 				runValidators: true,
 			}
-		);
-
-		sendEmail(
-			user.email,
-			'Password Reset Successfully',
-			{
-				name: user.name,
-			},
-			'./template/resetPassword.handlebars'
 		);
 
 		await TokenModel.findOneAndDelete({ userId });

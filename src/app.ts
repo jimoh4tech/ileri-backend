@@ -1,5 +1,6 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
+import morgan from "morgan";
 import helmet from 'helmet';
 import { errorHandler } from './error/error.middleware';
 import { notFoundHandler } from './error/not-found.middleware';
@@ -9,9 +10,12 @@ import { itemRouter } from './items/items.router';
 import { cartRouter } from './carts/carts.router';
 import { orderRouter } from './orders/orders.router';
 
+
 export const app: Application = express();
 app.use(cors());
 app.use(helmet());
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+app.use(morgan('tiny'));
 app.use(express.json());
 
 app.get('/', (_req: Request, res: Response) => {

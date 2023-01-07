@@ -21,7 +21,6 @@ export const createCart = async (req: Request, res: Response) => {
 			return res
 				.status(401)
 				.send('Unauthorized exception. Only accessible authenticated users.');
-
 		const existingCart: Cart = await CartModel.findOne({ user: user.id });
 
 		if (!existingCart) {
@@ -122,7 +121,9 @@ export const updateCartItemByOne = async (req: Request, res: Response) => {
 				}
 			);
 		}
-		const updatedCart = await CartModel.findById(cart.id).populate('items.itemId');
+		const updatedCart = await CartModel.findById(cart.id).populate(
+			'items.itemId'
+		);
 		const cartObj: ItemCart[] = updatedCart.items.map((it) => {
 			const item = it.itemId as unknown as Item;
 			return {
@@ -169,9 +170,7 @@ export const removeCartItem = async (req: Request, res: Response) => {
 
 		if (!cart) return res.status(404).send(`Not found. User cart is empty`);
 
-		const itemsToUpdate = cart.items.filter(
-			(it) => it.itemId + '' !== id
-		);
+		const itemsToUpdate = cart.items.filter((it) => it.itemId + '' !== id);
 
 		await CartModel.findByIdAndUpdate(
 			cart.id,
